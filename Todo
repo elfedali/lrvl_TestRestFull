@@ -1,0 +1,26 @@
+# Models
+php artisan make:model Product -m  
+php artisan make:model Transaction  -m     
+php artisan make:model Category  -m   
+
+php artisan make:model  Seller    (extends User)
+php artisan make:model  Buyer     (extends User)        
+
+
+# Controllers
+php artisan make:controller User/UserController -r  
+php artisan make:controller Transaction/TransactionController -r  
+php artisan make:controller Seller/SellerController -r 
+php artisan make:controller Product/ProductController -r  
+php artisan make:controller Category/CategoryController -r 
+php artisan make:controller Buyer/BuyerController -r     
+
+# Routes
+
+Route::resource('buyers', 'Buyer\BuyerController', ['only'=>['index','show']]);
+Route::resource('categories', 'Category\CategoryController', ['except'=>['create','edit']]);
+
+php artisan route:list 
+
+# Pivotal Table  (Alphabetical order (in Many To Many relatioship ))
+php artisan make:migration create_category_product_table --create=category_product
