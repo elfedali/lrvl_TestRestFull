@@ -24,3 +24,8 @@ php artisan route:list
 
 # Pivotal Table  (Alphabetical order (in Many To Many relatioship ))
 php artisan make:migration create_category_product_table --create=category_product
+
+
+# issue with migrations
+
+$table->unsignedInteger('parent_id')->nullable();
