@@ -62,10 +62,8 @@ class UserController extends ApiController
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(User $user)
     {
-
-        $user = User::findOrFail($id);
 
         return $this->showOne($user);
     }
@@ -88,17 +86,14 @@ class UserController extends ApiController
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, User $user)
     {
 
-        $user = User::findOrFail($id);
         $rules = [
             'email' => 'email|unique:users,email,' . $user->id, //-> email' => 'unique:table,email_column_to_check,id_to_ignore'
             'password' => 'min:6|confirmed',
             'admin' => 'in:' . User::ADMIN_USER . ',' . User::REGULAR_USER,
         ];
-
-
 
         if ($request->has('name')) :
             $user->name = $request->name;
@@ -134,9 +129,8 @@ class UserController extends ApiController
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(User $user)
     {
-        $user = User::findOrFail($id);
 
         $user->delete();
 
