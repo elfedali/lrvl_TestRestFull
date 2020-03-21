@@ -29,3 +29,7 @@ php artisan make:migration create_category_product_table --create=category_produ
 # issue with migrations
 
 $table->unsignedInteger('parent_id')->nullable();
+
+# Create Controller with implicit 
+
+php artisan make:controller Category/CategoryController -r -m Category
