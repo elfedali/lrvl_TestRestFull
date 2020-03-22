@@ -33,3 +33,7 @@ $table->unsignedInteger('parent_id')->nullable();
 # Create Controller with implicit 
 
 php artisan make:controller Category/CategoryController -r -m Category
+
+# Implimenting complex operation
+
+php artisan make:controller Category/CategoryTransactionController -r -m Category 
