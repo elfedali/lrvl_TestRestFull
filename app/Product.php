@@ -18,6 +18,10 @@ class Product extends Model
         'image',
         'seller_id'
     ];
+    protected $hidden = [
+        'pivot'  // hide this is the json results ex: /api/categories/1/products
+    ];
+
     /**
      * @return Boolean
      */
