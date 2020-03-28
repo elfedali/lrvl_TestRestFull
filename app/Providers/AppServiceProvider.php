@@ -37,7 +37,7 @@ class AppServiceProvider extends ServiceProvider {
             if ($user->isDirty('email')) :
                 retry(5, function()use ($user) {
                     Mail::to($user)->send(new UserMailChange($user));
-                });
+                },100);
             endif;
         });
 
