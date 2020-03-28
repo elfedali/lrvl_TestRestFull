@@ -5,16 +5,16 @@ namespace App\Http\Controllers\User;
 use App\User;
 use Illuminate\Http\Request;
 use App\Http\Controllers\ApiController;
+use Illuminate\Support\Facades\Mail;
 
-class UserController extends ApiController
-{
+class UserController extends ApiController {
+
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
-    {
+    public function index() {
         $all_users = User::all();
         return $this->showAll($all_users);
     }
@@ -24,8 +24,7 @@ class UserController extends ApiController
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
-    {
+    public function create() {
         //
     }
 
@@ -35,8 +34,7 @@ class UserController extends ApiController
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
-    {
+    public function store(Request $request) {
         $rules = [
             'name' => 'required|max:100',
             'email' => 'required|email|unique:users',
@@ -53,7 +51,7 @@ class UserController extends ApiController
 
         $user = User::create($data);
 
-        return $this->showOne(['data' => $user], 201);
+        return $this->showOne($user, 201);
     }
 
     /**
@@ -62,8 +60,7 @@ class UserController extends ApiController
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show(User $user)
-    {
+    public function show(User $user) {
 
         return $this->showOne($user);
     }
@@ -74,8 +71,7 @@ class UserController extends ApiController
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
-    {
+    public function edit($id) {
         //
     }
 
@@ -86,8 +82,7 @@ class UserController extends ApiController
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, User $user)
-    {
+    public function update(Request $request, User $user) {
 
         $rules = [
             'email' => 'email|unique:users,email,' . $user->id, //-> email' => 'unique:table,email_column_to_check,id_to_ignore'
@@ -99,7 +94,7 @@ class UserController extends ApiController
             $user->name = $request->name;
         endif;
 
-        if ($request->has('email') &&  $request->email != $user->email) :
+        if ($request->has('email') && $request->email != $user->email) :
             $user->verified = User::UNVERIFIED_USER; // user is not verified any more
             $user->verification_token = User::generateVerificationCode();
             $user->email = $request->email;
@@ -129,16 +124,14 @@ class UserController extends ApiController
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy(User $user)
-    {
+    public function destroy(User $user) {
 
         $user->delete();
 
         return $this->showOne($user);
     }
 
-    public function verify($token)
-    {
+    public function verify($token) {
 
         $user = User::where('verification_token', $token)->firstOrFail();
 
@@ -146,7 +139,20 @@ class UserController extends ApiController
         $user->verification_token = null;
 
         $user->save();
-        
+
         return $this->showMessage('The account has been verified succesfully');
     }
+
+    public function resend(User $user) {
+        if ($user->isVerified()):
+            return $this->errorResponse('This user is already verified!', 409);
+        endif;
+
+        retry(5, function () use ($user) {
+            Mail::to($user)->send(new \App\Mail\UserCreated($user));
+        }, 100);
+
+        return $this->showMessage('The verification email has been resend.');
+    }
+
 }
